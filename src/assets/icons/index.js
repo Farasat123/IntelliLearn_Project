@@ -1,0 +1,22 @@
+// src/assets/icons/index.js
+export {
+  Brain,
+  BookOpen,
+  ArrowRight,
+  Menu,
+  X,
+  Upload,
+  MessageSquare,
+  Cpu,
+  Shield,
+  LayoutDashboard,
+  Zap,
+  Users,
+  Target,
+  Clock,
+  CheckCircle,
+  Mail,
+  Linkedin,
+  Github,
+  Twitter,
+} from "lucide-react";
