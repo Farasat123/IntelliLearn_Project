@@ -9,7 +9,10 @@ import {
   User,
   LogOut,
   X as CloseIcon,
-  Brain
+  Brain,
+  ChevronLeft,
+  ChevronRight,
+  Trash2
 } from "lucide-react";
 
 // --- Mock Data ---
@@ -28,6 +31,20 @@ export default function Dashboard() {
 
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsSidebarOpen(true);
+      } else {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Scroll to bottom when messages update
   useEffect(() => {
@@ -74,7 +91,7 @@ export default function Dashboard() {
 
   const handleNewChat = () => {
     setMessages([]);
-    const newChat = { id: chatHistory.length + 1, title: `New Chat ${chatHistory.length + 1}` };
+    const newChat = { id: Date.now(), title: `New Chat ${chatHistory.length + 1}` };
     setChatHistory([newChat, ...chatHistory]);
     // Close sidebar on mobile after starting a new chat
     if (window.innerWidth < 768) setIsSidebarOpen(false);
@@ -87,15 +104,43 @@ export default function Dashboard() {
     if (window.innerWidth < 768) setIsSidebarOpen(false);
   };
 
-  const SidebarLink = ({ icon, text, onClick }) => (
+  const deleteChat = (chatId, e) => {
+    e.stopPropagation(); // Prevent triggering the loadChat function
+    setChatHistory(chatHistory.filter(chat => chat.id !== chatId));
+    
+    // If we're currently viewing the deleted chat, clear messages
+    if (messages.length > 0 && messages[0].content.includes(chatHistory.find(chat => chat.id === chatId)?.title)) {
+      setMessages([]);
+    }
+  };
+
+  const SidebarLink = ({ icon, text, onClick, onDelete, showDelete = false }) => (
     <button
       onClick={onClick}
-      className="flex items-center w-full p-3 rounded-lg text-gray-200 hover:bg-gray-700 transition-colors"
+      className="group flex items-center justify-between w-full p-3 rounded-lg text-gray-200 hover:bg-gray-700 transition-colors relative"
     >
-      {icon}
-      <span className="ml-3 truncate">{text}</span>
+      <div className="flex items-center flex-1 min-w-0">
+        {icon}
+        <span className="ml-3 truncate">{text}</span>
+      </div>
+      
+      {/* Delete button that appears on hover */}
+      {showDelete && (
+        <button
+          onClick={onDelete}
+          className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-400 transition-all duration-200 ml-2 flex-shrink-0"
+          title="Delete chat"
+        >
+          <Trash2 size={16} />
+        </button>
+      )}
     </button>
   );
+
+  // Toggle sidebar function
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-gray-50 font-sans">
@@ -110,19 +155,22 @@ export default function Dashboard() {
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-30 w-64 flex flex-col bg-gray-900 text-white p-4 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-y-0 left-0 z-30 w-64 flex flex-col bg-gray-900 text-white p-4 transform transition-all duration-300 ease-in-out ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:relative md:translate-x-0 md:flex md:flex-shrink-0`}
+        } md:relative md:transform md:transition-all md:duration-300 ${
+          isSidebarOpen ? "md:translate-x-0 md:w-64" : "md:-translate-x-full md:w-0"
+        } md:overflow-hidden`}
       >
+        {/* Sidebar Header - Toggle button removed from desktop */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Brain  size={24} />
+            <Brain size={24} />
             <h1 className="text-xl font-bold">IntelliLearn</h1>
           </div>
-          {/* Close Button: Visible only when sidebar is open on small screens */}
+          {/* Close Button: Visible only on mobile */}
           <button
             onClick={() => setIsSidebarOpen(false)}
-            className="md:hidden p-1 rounded-full hover:bg-gray-700"
+            className="md:hidden p-1 rounded-full hover:bg-gray-700 transition-colors"
           >
             <CloseIcon size={20} />
           </button>
@@ -144,6 +192,8 @@ export default function Dashboard() {
               icon={<MessageSquare size={18} />}
               text={chat.title}
               onClick={() => loadChat(chat.id)}
+              onDelete={(e) => deleteChat(chat.id, e)}
+              showDelete={true}
             />
           ))}
         </div>
@@ -154,18 +204,18 @@ export default function Dashboard() {
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col h-screen">
+      <div className={`flex-1 flex flex-col h-screen transition-all duration-300 ${
+        isSidebarOpen ? "md:ml-0" : "md:ml-0"
+      }`}>
 
-        {/* Mobile Header/Toggle Button: Visible only on mobile when sidebar is closed */}
-        <header className="md:hidden flex items-center p-4 bg-white border-b border-gray-200 shadow-sm flex-shrink-0">
-          {!isSidebarOpen && (
-            <button
-              onClick={() => setIsSidebarOpen(true)}
-              className="p-1 rounded-full text-gray-700 hover:bg-gray-100 mr-3"
-            >
-              <Menu size={24} />
-            </button>
-          )}
+        {/* Header with Toggle Button - Always visible */}
+        <header className="flex items-center p-4 bg-white border-b border-gray-200 shadow-sm flex-shrink-0">
+          <button
+            onClick={toggleSidebar}
+            className="p-1 rounded-full text-gray-700 hover:bg-gray-100 mr-3"
+          >
+            <Menu size={24} />
+          </button>
           <div className="flex items-center gap-2">
             <Brain size={20} className="text-blue-600" />
             <h1 className="text-lg font-bold text-gray-800">IntelliLearn</h1>
@@ -174,7 +224,7 @@ export default function Dashboard() {
 
         {/* Main Content (Messages): Scrollable area for the chat history */}
         <main
-          className="flex-1 p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200"
+          className="flex-1 p-4 md:p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200"
           style={{ minHeight: 0 }} // Ensures the flex container doesn't overflow its parent
         >
           {/* Inner container to center content and control message flow */}
@@ -182,7 +232,7 @@ export default function Dashboard() {
 
             {messages.length === 0 ? (
               // Empty state: uses flex-1 to center vertically in the h-full container
-              <div className="flex-1 flex flex-col items-center justify-center text-gray-800 gap-4">
+              <div className="flex-1 flex flex-col items-center justify-center text-gray-800 gap-4 px-4">
                 <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center shadow-lg">
                   <Brain size={32} className="text-white" />
                 </div>
@@ -198,14 +248,14 @@ export default function Dashboard() {
                     className={`flex items-start gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-md ${
+                      className={`flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md ${
                         msg.role === "user" ? "bg-blue-600 text-white order-2" : "bg-gray-200 text-gray-700 order-1"
                       }`}
                     >
-                      {msg.role === "user" ? <User size={20} /> : <Brain size={20} />}
+                      {msg.role === "user" ? <User size={16} className="md:size-5" /> : <Brain size={16} className="md:size-5" />}
                     </div>
                     <div
-                      className={`p-4 rounded-xl shadow-md max-w-[90%] sm:max-w-[75%] lg:max-w-[60%] break-words whitespace-pre-wrap transition-all ${
+                      className={`p-3 md:p-4 rounded-xl shadow-md max-w-[85%] sm:max-w-[75%] lg:max-w-[60%] break-words whitespace-pre-wrap transition-all ${
                         msg.role === "user"
                           ? "bg-blue-600 text-white order-1 rounded-br-none" // User bubble style
                           : "bg-white text-gray-800 border border-gray-200 order-2 rounded-tl-none" // AI bubble style
@@ -230,9 +280,9 @@ export default function Dashboard() {
             <button
               type="button"
               onClick={() => fileInputRef.current.click()}
-              className="p-3 text-gray-500 hover:text-blue-600 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
+              className="p-2 md:p-3 text-gray-500 hover:text-blue-600 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
             >
-              <Paperclip size={22} />
+              <Paperclip size={20} className="md:size-6" />
             </button>
             {/* Input Textarea */}
             <textarea
@@ -245,7 +295,7 @@ export default function Dashboard() {
                 }
               }}
               placeholder="Ask Questions from your uploaded content..."
-              className="flex-1 p-3 text-gray-800 resize-none border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-xl transition-all duration-200 max-h-[150px] overflow-y-auto" // Increased max height slightly
+              className="flex-1 p-3 text-gray-800 resize-none border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none rounded-xl transition-all duration-200 max-h-[150px] overflow-y-auto"
               rows={1}
             />
             {/* Send Button */}
@@ -253,9 +303,9 @@ export default function Dashboard() {
               type="submit"
               onClick={handleSend}
               disabled={!currentInput.trim()}
-              className="p-3 text-white bg-blue-600 rounded-xl disabled:bg-gray-400 hover:bg-blue-700 transition-colors flex-shrink-0 shadow-lg"
+              className="p-2 md:p-3 text-white bg-blue-600 rounded-xl disabled:bg-gray-400 hover:bg-blue-700 transition-colors flex-shrink-0 shadow-lg"
             >
-              <Send size={20} />
+              <Send size={20} className="md:size-5" />
             </button>
           </div>
         </div>

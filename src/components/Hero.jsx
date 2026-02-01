@@ -29,8 +29,10 @@ export default function Hero() {
   return (
     <section className="relative bg-white min-h-screen flex items-center justify-center">
       {/* Glow Background */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 
-                      w-full max-w-[52rem] h-[52rem] bg-blue-50 opacity-50 rounded-full blur-3xl -z-10" />
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 
+                    w-full max-w-[52rem] h-[52rem] bg-blue-50 opacity-50 rounded-full blur-3xl -z-10"
+      />
 
       {/* Centered Content */}
       <div className="flex flex-col items-center justify-center text-center px-6 md:px-0 max-w-4xl">
@@ -38,12 +40,21 @@ export default function Hero() {
           ✨ AI-Powered Learning Platform
         </div>
 
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
-          Your AI-Powered{" "}
-          <span className="text-blue-600 relative">
+        {/* FIRST LINE */}
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight">
+          Your AI-Powered
+        </h1>
+
+        {/* SECOND LINE – Animated Text */}
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-blue-600 mb-2">
+          <span className="inline-block whitespace-nowrap">
             {displayed}
             <span className="border-r-4 border-blue-600 ml-1 animate-pulse"></span>
-          </span>{" "}
+          </span>
+        </h1>
+
+        {/* THIRD LINE – FULL ORIGINAL TEXT */}
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 leading-tight mb-6">
           for Smart Exam Preparation
         </h1>
 

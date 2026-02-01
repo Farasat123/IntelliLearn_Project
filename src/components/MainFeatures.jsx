@@ -22,7 +22,7 @@ export default function MainFeatures() {
       title: "Ask Questions Instantly",
       description:
         "Get AI-generated contextual answers from your uploaded study materials.",
-      highlighted: true,
+      
     },
     {
       icon: <Cpu size={28} className="text-blue-600" />,
