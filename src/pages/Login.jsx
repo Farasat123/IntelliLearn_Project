@@ -21,14 +21,14 @@ export default function Login() {
       return;
     }
 
-    navigate("/dashboard");
+    navigate("/dashboard-home");
   };
 
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: "http://localhost:5173/dashboard",
+        redirectTo: "http://localhost:5173/dashboard-home",
       },
     });
 

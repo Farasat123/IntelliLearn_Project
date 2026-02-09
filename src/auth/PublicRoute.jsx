@@ -15,8 +15,8 @@ export default function PublicRoute({ children }) {
   // waiting...
   if (session === undefined) return <div>Loading...</div>;
 
-  // if logged in → redirect to dashboard
-  if (session) return <Navigate to="/dashboard" replace />;
+  // if logged in → redirect to dashboard home
+  if (session) return <Navigate to="/dashboard-home" replace />;
 
   return children;
 }

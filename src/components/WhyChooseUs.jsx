@@ -13,9 +13,14 @@ export default function WhyChooseUs() {
   ];
 
   return (
-    <section className="bg-white py-16 md:py-24">
+    <section className="relative overflow-hidden bg-gradient-to-br from-blue-900/15 via-blue-100 to-white py-16 md:py-24">
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <span className="absolute -top-24 right-6 h-72 w-72 rounded-full bg-blue-300/45 blur-[120px]" />
+        <span className="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-blue-200/50 blur-[130px]" />
+        <span className="absolute top-10 left-1/2 h-56 w-56 -translate-x-1/2 rounded-full bg-cyan-200/35 blur-[110px]" />
+      </div>
       {/* ✅ SAME CORNER SPACING AS OTHER SECTIONS */}
-      <div className="container max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="relative container max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
         <div className="flex flex-col gap-6">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
@@ -42,9 +47,7 @@ export default function WhyChooseUs() {
             To make quality education accessible and efficient for every student by combining the power of AI with personalized learning materials. We believe that technology should enhance, not replace, the learning experience.
           </p>
 
-          <div className="inline-block bg-white/20 text-white px-4 py-2 rounded-full text-sm font-medium relative z-10">
-            Powered by Advanced RAG Technology
-          </div>
+
         </div>
 
       </div>

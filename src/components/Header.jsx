@@ -52,7 +52,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 w-full z-20 bg-white/80 backdrop-blur-sm shadow-sm">
+    <header className="fixed top-0 left-0 w-full z-20 bg-white/85 backdrop-blur-md shadow-sm border-b border-blue-50">
       <nav className="container max-w-7xl mx-auto px-4 flex justify-between items-center py-4">
 
         {/* Logo */}
@@ -60,7 +60,7 @@ export default function Header() {
           onClick={() => handleNavClick("/")}
           className="flex items-center gap-3 cursor-pointer"
         >
-          <div className="bg-blue-600 text-white p-2 rounded-lg">
+          <div className="bg-gradient-to-br from-blue-600 to-blue-500 text-white p-2 rounded-lg shadow-inner shadow-blue-900/20">
             <Brain size={22} />
           </div>
           <span className="text-xl font-bold text-gray-900">IntelliLearn</span>
@@ -72,13 +72,19 @@ export default function Header() {
             <button
               key={l.name}
               onClick={() => handleNavClick(l.href)}
-              className={`pb-1 transition-colors ${
+              className={`group relative px-1 pb-1 font-medium transition-colors ${
                 activeSection === l.href
-                  ? "text-blue-600 border-b-2 border-blue-600 font-semibold"
+                  ? "text-blue-600"
                   : "text-gray-600 hover:text-blue-600"
               }`}
             >
-              {l.name}
+              <span className="relative z-10">{l.name}</span>
+              <span
+                className={`absolute -bottom-1 left-0 right-0 h-0.5 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 transition-opacity duration-300 ${
+                  activeSection === l.href ? "opacity-100" : "opacity-0 group-hover:opacity-60"
+                }`}
+              />
+              <span className="absolute inset-0 rounded-lg bg-blue-50/0 transition duration-300 group-hover:bg-blue-50/80" aria-hidden="true" />
             </button>
           ))}
         </div>
@@ -87,8 +93,10 @@ export default function Header() {
         <div className="hidden md:flex items-center gap-4">
           <Link
             to="/login"
-            className={`transition ${
-              location.pathname === "/login" ? "text-blue-600 font-semibold" : "text-gray-600 hover:text-blue-600"
+            className={`relative px-4 py-2 rounded-lg font-semibold transition-all ${
+              location.pathname === "/login"
+                ? "text-blue-700 bg-blue-50"
+                : "text-gray-600 hover:text-blue-700 hover:bg-blue-50/90"
             }`}
           >
             Login
@@ -96,13 +104,14 @@ export default function Header() {
 
           <Link
             to="/signup"
-            className={`px-5 py-2 rounded-lg font-semibold shadow transition-all ${
+            className={`relative px-5 py-2 rounded-xl font-semibold shadow transition-all overflow-hidden ${
               location.pathname === "/signup"
-                ? "bg-blue-800 text-white"
-                : "bg-blue-600 text-white hover:bg-blue-800"
+                ? "bg-blue-700 text-white shadow-blue-500/40"
+                : "bg-gradient-to-r from-blue-600 to-blue-500 text-white"
             }`}
           >
-            Sign Up
+            <span className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity" aria-hidden="true" />
+            <span className="relative">Sign Up</span>
           </Link>
         </div>
 
@@ -117,7 +126,7 @@ export default function Header() {
 
       {/* Mobile Nav */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white shadow-xl w-full">
+        <div className="md:hidden bg-white shadow-xl w-full border-t border-blue-100">
           <div className="flex flex-col p-6 space-y-4">
             {navLinks.map((l) => (
               <button
@@ -148,10 +157,10 @@ export default function Header() {
             <Link
               to="/signup"
               onClick={() => setIsMobileMenuOpen(false)}
-              className={`px-5 py-3 rounded-lg text-center font-semibold transition ${
+              className={`px-5 py-3 rounded-xl text-center font-semibold transition ${
                 location.pathname === "/signup"
-                  ? "bg-blue-800 text-white"
-                  : "bg-blue-600 text-white hover:bg-blue-700"
+                  ? "bg-blue-700 text-white"
+                  : "bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:shadow-lg"
               }`}
             >
               Sign Up

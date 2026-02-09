@@ -18,6 +18,7 @@ import Footer from "./components/Footer";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+import DashboardHome from "./pages/DashboardHome";
 import ForgotPassword from "./pages/ForgotPassword";     // <-- ADDED
 import UpdatePassword from "./pages/UpdatePassword";     // <-- ADDED
 
@@ -87,7 +88,10 @@ export default function App() {
           }
         />
 
-        {/* Dashboard (no header/footer) */}
+        {/* Dashboard Home - Course Creation (no header/footer) */}
+        <Route path="/dashboard-home" element={<DashboardHome />} />
+
+        {/* Dashboard - Chatbot UI (no header/footer) */}
         <Route path="/dashboard" element={<Dashboard />} />
         
       </Routes>
