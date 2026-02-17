@@ -93,7 +93,7 @@ export default function App() {
 
         {/* Dashboard - Chatbot UI (no header/footer) */}
         <Route path="/dashboard" element={<Dashboard />} />
-        
+
       </Routes>
     </Router>
   );
