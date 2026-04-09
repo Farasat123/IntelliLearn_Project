@@ -3,10 +3,12 @@
 // This is the single source of truth for all backend API communications
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
+const RETRIEVAL_API_BASE_URL = import.meta.env.VITE_RETRIEVAL_API_URL;
 
 class RAGApiService {
-    constructor(baseUrl = API_BASE_URL) {
+    constructor(baseUrl = API_BASE_URL, retrievalUrl = RETRIEVAL_API_BASE_URL) {
         this.baseUrl = baseUrl;
+        this.retrievalUrl = retrievalUrl;
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -228,6 +230,102 @@ class RAGApiService {
             return true;
         } catch (error) {
             console.error("Delete document error:", error);
+            throw error;
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // RAG RETRIEVAL (Chat & AI Responses)
+    // ═══════════════════════════════════════════════════════════════
+
+    /**
+     * Generate AI response from user query with citations
+     * This is the primary endpoint for the chat feature
+     * @param {string} userId - User ID
+     * @param {string} topicId - Topic ID
+     * @param {string} query - User's question
+     * @returns {Promise<{query: string, response: string, citations: Array, retrieved_chunks: Array, context_used: string, user_message_stored: boolean, assistant_message_stored: boolean}>}
+     */
+    async generateResponse(userId, topicId, query) {
+        try {
+            const res = await fetch(`${this.retrievalUrl}/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId, topic_id: topicId, query })
+            });
+
+            if (!res.ok) {
+                const error = await res.json().catch(() => ({}));
+                throw new Error(error.detail || `Failed to generate response: ${res.status}`);
+            }
+
+            return await res.json();
+        } catch (error) {
+            console.error('Generate response error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get all chat history for a topic (newest first)
+     * @param {string} topicId - Topic ID
+     * @returns {Promise<{topic_id: string, messages: Array, total_count: number}>}
+     */
+    async getChatHistory(topicId) {
+        try {
+            const res = await fetch(`${this.retrievalUrl}/chat/history?topic_id=${topicId}`);
+
+            if (!res.ok) {
+                throw new Error(`Failed to fetch chat history: ${res.status}`);
+            }
+
+            return await res.json();
+        } catch (error) {
+            console.error('Get chat history error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get recent messages for a topic
+     * @param {string} topicId - Topic ID
+     * @param {number} limit - Number of messages to fetch (default 5, max 20)
+     * @returns {Promise<{topic_id: string, messages: Array, total_count: number}>}
+     */
+    async getRecentMessages(topicId, limit = 5) {
+        try {
+            const res = await fetch(`${this.retrievalUrl}/chat/recent?topic_id=${topicId}&limit=${limit}`);
+
+            if (!res.ok) {
+                throw new Error(`Failed to fetch recent messages: ${res.status}`);
+            }
+
+            return await res.json();
+        } catch (error) {
+            console.error('Get recent messages error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Manually store a message (fallback when /generate doesn't store automatically)
+     * @param {string} topicId - Topic ID
+     * @param {string} role - "user" or "assistant"
+     * @param {string} content - Message text
+     * @returns {Promise<any>}
+     */
+    async storeMessage(topicId, role, content) {
+        try {
+            const url = `${this.retrievalUrl}/chat/message?topic_id=${encodeURIComponent(topicId)}&role=${encodeURIComponent(role)}&content=${encodeURIComponent(content)}`;
+            const res = await fetch(url);
+
+            if (!res.ok) {
+                throw new Error(`Failed to store message: ${res.status}`);
+            }
+
+            return await res.json();
+        } catch (error) {
+            console.error('Store message error:', error);
             throw error;
         }
     }

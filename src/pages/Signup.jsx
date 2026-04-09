@@ -1,11 +1,13 @@
 // src/pages/Signup.jsx
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { supabase } from "../supabaseClient";
+import { Brain, Mail, Lock, User } from "../assets/icons";
 
 export default function Signup() {
   const [username, setUsername] = useState("");
-  const [email, setEmail]       = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
@@ -46,90 +48,201 @@ export default function Signup() {
     if (error) alert(error.message);
   };
 
+  const gradientOrbs = [
+    { delay: 0, className: "top-10 left-16 w-32 h-32" },
+    { delay: 0.8, className: "bottom-12 right-10 w-40 h-40" },
+    { delay: 1.6, className: "top-1/3 right-1/4 w-24 h-24" },
+  ];
+
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-gradient-to-br from-blue-200 via-white to-blue-100">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-b from-blue-50 via-white to-blue-100 flex items-center justify-center px-6">
 
-      {/* LEFT SIDE IMAGE */}
-      <div className="hidden lg:flex items-center justify-center bg-gray-100">
-        <img
-          src="/signup.jpg"
-          alt="Signup Visual"
-          className="w-full h-full object-cover"
+      {/* Animated gradient orbs */}
+      {gradientOrbs.map((orb, idx) => (
+        <motion.span
+          key={idx}
+          className={`absolute rounded-full blur-3xl bg-blue-200/40 -z-10 ${orb.className}`}
+          animate={{
+            opacity: [0.4, 0.7, 0.4],
+            scale: [1, 1.2, 1],
+            y: [0, -15, 0],
+          }}
+          transition={{ duration: 6, repeat: Infinity, delay: orb.delay, ease: "easeInOut" }}
         />
-      </div>
+      ))}
 
-      {/* RIGHT SIDE SIGNUP FORM */}
-      <div className="flex items-center justify-center p-8 bg-transparent">
-        <form
-          onSubmit={handleSignup}
-          className="bg-white p-8 rounded-xl shadow-md w-full max-w-md"
+      {/* Light sweep effect */}
+      <motion.div
+        className="absolute inset-y-0 left-1/3 w-1/2 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-6 -z-10"
+        animate={{ x: ["-50%", "120%"], opacity: [0, 1, 0] }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* MAIN CONTAINER */}
+      <div className="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+
+        {/* LEFT SIDE: Branding & Info */}
+        <motion.div
+          initial={{ opacity: 0, x: -30 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="hidden lg:flex flex-col justify-center"
         >
-          <h2 className="text-2xl font-bold mb-6 text-center">Create Account</h2>
-
-          {/* Username */}
-          <input
-            type="text"
-            placeholder="Username"
-            className="w-full p-3 mb-4 border rounded"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-
-          {/* Email */}
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full p-3 mb-4 border rounded"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-
-          {/* Password */}
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full p-3 mb-6 border rounded"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-
-          {/* Signup Button */}
-          <button className="w-full bg-blue-600 text-white p-3 rounded font-semibold hover:bg-blue-700 transition">
-            Sign Up
-          </button>
-
-          {/* Divider */}
-          <div className="flex items-center my-6">
-            <div className="flex-1 h-px bg-gray-300"></div>
-            <span className="px-4 text-gray-500">or</span>
-            <div className="flex-1 h-ppx bg-gray-300"></div>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="bg-gradient-to-br from-blue-600 to-blue-500 text-white p-2.5 rounded-xl shadow-lg shadow-blue-500/20">
+              <Brain size={28} />
+            </div>
+            <span className="text-2xl font-bold text-gray-900 tracking-tight">IntelliLearn</span>
           </div>
 
-          {/* Google Signup */}
-          <button
-            type="button"
-            onClick={handleGoogleSignup}
-            className="w-full flex items-center justify-center gap-3 border p-3 rounded hover:bg-gray-100 transition"
-          >
-            <img
-              src="https://www.svgrepo.com/show/355037/google.svg"
-              alt="Google"
-              className="w-5 h-5"
-            />
-            Sign up with Google
-          </button>
+          <h1 className="text-5xl font-extrabold text-gray-900 mb-6 leading-[1.1]">
+            Join the <br />
+            <span className="text-blue-600">Future of Learning</span>
+          </h1>
 
-          {/* Redirect to Login */}
-          <p className="text-center text-gray-600 mt-6">
-            Already have an account?{" "}
-            <Link to="/login" className="text-blue-600 font-medium hover:underline">
-              Log in
-            </Link>
+          <p className="text-xl text-gray-600 mb-8 max-w-lg leading-relaxed">
+            Create an account to start your journey with study tool and personalized exam preparation.
           </p>
-        </form>
+
+          <div className="flex flex-col gap-3">
+            {[
+              "All-in-one study platform",
+              "Advanced AI tutor assistance",
+              "Track your progress in real-time"
+            ].map((item, idx) => (
+              <div key={idx} className="flex items-center gap-3 text-gray-700 font-semibold text-lg">
+                <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center">
+                  <div className="w-2 h-2 rounded-full bg-blue-600" />
+                </div>
+                {item}
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* RIGHT SIDE: Signup Form */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="flex items-center justify-center lg:justify-end"
+        >
+          <form
+            onSubmit={handleSignup}
+            className="bg-white/80 backdrop-blur-xl p-7 rounded-[2rem] shadow-2xl shadow-blue-500/10 w-full max-w-md border border-white/50"
+          >
+            <div className="mb-8 text-center">
+              <h2 className="text-3xl font-bold text-blue-600 mb-2 tracking-tight">Sign Up</h2>
+              <p className="text-gray-500 font-medium">Create your account to get started</p>
+            </div>
+
+            <div className="space-y-4">
+              {/* Username */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-gray-700 ml-1">Full Name</label>
+                <div className="relative group">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                    <User size={20} />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="John Doe"
+                    className="w-full pl-12 pr-5 py-3 border border-gray-200 rounded-2xl bg-white/50 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-300 outline-none"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-gray-700 ml-1">Email Address</label>
+                <div className="relative group">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                    <Mail size={20} />
+                  </div>
+                  <input
+                    type="email"
+                    placeholder="name@example.com"
+                    className="w-full pl-12 pr-5 py-3 border border-gray-200 rounded-2xl bg-white/50 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-300 outline-none"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-gray-700 ml-1">Password</label>
+                <div className="relative group">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                    <Lock size={20} />
+                  </div>
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    className="w-full pl-12 pr-5 py-3 border border-gray-200 rounded-2xl bg-white/50 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-300 outline-none"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Signup Button */}
+            <motion.button
+              whileHover={{ 
+                scale: 1.02, 
+                translateY: -3,
+                filter: "brightness(1.1)",
+                boxShadow: "0 20px 25px -5px rgb(59 130 246 / 0.4)"
+              }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white mt-4 py-3.5 rounded-2xl font-bold shadow-xl shadow-blue-500/25 transition-all duration-300"
+            >
+              Create Account
+            </motion.button>
+
+            {/* Divider */}
+            <div className="relative flex items-center my-6">
+              <div className="flex-1 h-px bg-gray-100" />
+              <span className="px-4 text-gray-400 text-[10px] font-bold uppercase tracking-widest">
+                or
+              </span>
+              <div className="flex-1 h-px bg-gray-100" />
+            </div>
+
+            {/* Google Button */}
+            <motion.button
+              type="button"
+              onClick={handleGoogleSignup}
+              whileHover={{ scale: 1.01, backgroundColor: "#f9fafb" }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full flex items-center justify-center gap-3 border border-gray-200 py-3 rounded-2xl bg-white 
+              hover:border-blue-300 transition-all duration-300 group"
+            >
+              <img
+                src="https://developers.google.com/identity/images/g-logo.png"
+                alt="Google"
+                className="w-5 h-5 group-hover:scale-110 transition-transform"
+              />
+              <span className="font-bold text-gray-700">
+                Sign up with Google
+              </span>
+            </motion.button>
+
+            {/* Login Link */}
+            <p className="text-center mt-6 text-gray-600 text-sm font-medium">
+              Already have an account?{" "}
+              <Link to="/login" className="text-blue-600 font-bold hover:underline">
+                Log in
+              </Link>
+            </p>
+          </form>
+        </motion.div>
       </div>
     </div>
   );

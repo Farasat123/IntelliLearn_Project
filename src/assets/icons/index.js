@@ -16,7 +16,10 @@ export {
   Clock,
   CheckCircle,
   Mail,
+  Lock,
   Linkedin,
   Github,
   Twitter,
+  User,
+  ArrowLeft,
 } from "lucide-react";

@@ -20,6 +20,67 @@ import { supabase } from "../supabaseClient";
 import ragApi from "../services/ragApi";
 import { useDocumentUpload } from "../hooks/useDocumentUpload";
 
+// Component to render message content with citation tooltips
+function MessageWithCitations({ content, citations }) {
+  const [hoveredCitation, setHoveredCitation] = useState(null);
+
+  // Split content by citation markers [1], [2], etc.
+  const renderContentWithCitations = () => {
+    const parts = [];
+    const citationRegex = /\[(\d+)\]/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = citationRegex.exec(content)) !== null) {
+      // Add text before citation
+      if (match.index > lastIndex) {
+        parts.push(content.substring(lastIndex, match.index));
+      }
+
+      // Add citation badge
+      const citationNum = parseInt(match[1]);
+      const citation = citations.find(c => c.number === citationNum);
+
+      parts.push(
+        <span
+          key={`citation-${match.index}`}
+          className="relative inline-block"
+          onMouseEnter={() => setHoveredCitation(citationNum)}
+          onMouseLeave={() => setHoveredCitation(null)}
+        >
+          <sup className="text-blue-600 font-bold cursor-pointer hover:text-blue-800">
+            [{citationNum}]
+          </sup>
+          {hoveredCitation === citationNum && citation && (
+            <div className="absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-xl">
+              <div className="font-bold mb-1">{citation.file_name}</div>
+              <div className="text-gray-300 mb-1">
+                {citation.section_title && <span>Section: {citation.section_title} • </span>}
+                Page {citation.page}
+              </div>
+              <div className="text-gray-400 text-xs italic line-clamp-3">{citation.chunk_text}</div>
+              {/* Arrow */}
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+            </div>
+          )}
+        </span>
+      );
+
+      lastIndex = citationRegex.lastIndex;
+    }
+
+    // Add remaining text
+    if (lastIndex < content.length) {
+      parts.push(content.substring(lastIndex));
+    }
+
+    return parts.length > 0 ? parts : content;
+  };
+
+  return <div>{renderContentWithCitations()}</div>;
+}
+
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -44,6 +105,8 @@ export default function Dashboard() {
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(true);
 
   const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
@@ -86,6 +149,39 @@ export default function Dashboard() {
     };
 
     loadDocuments();
+  }, [userId, topicId]);
+
+  // Load chat history when userId and topicId are available
+  useEffect(() => {
+    if (!userId || !topicId) return;
+
+    const loadHistory = async () => {
+      console.log('🔄 Loading chat history for topicId:', topicId);
+      setLoadingHistory(true);
+      try {
+        const data = await ragApi.getChatHistory(topicId);
+        console.log('✅ Chat history response:', data);
+        console.log('📊 Total messages:', data.messages?.length || 0);
+
+        // API returns newest first, we want oldest first for chat display
+        const formattedMessages = (data.messages || []).reverse().map(msg => ({
+          role: msg.role,
+          content: msg.content,
+          // Citations are not returned in chat history, only in /generate
+        }));
+
+        console.log('📝 Formatted messages:', formattedMessages);
+        setMessages(formattedMessages);
+      } catch (err) {
+        console.error('❌ Failed to load chat history:', err);
+        console.error('Error details:', err.message);
+        // Don't show error to user, just start with empty messages
+      } finally {
+        setLoadingHistory(false);
+      }
+    };
+
+    loadHistory();
   }, [userId, topicId]);
 
   // Document upload hook
@@ -172,7 +268,7 @@ export default function Dashboard() {
     navigate("/");
   };
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e?.preventDefault();
 
     // Check if sources are uploaded and processed
@@ -182,20 +278,63 @@ export default function Dashboard() {
       return;
     }
 
-    if (!currentInput.trim()) return;
+    if (!currentInput.trim() || isGenerating) return;
 
-    const newUserMessage = { role: "user", content: currentInput };
+    const query = currentInput.trim();
+    const newUserMessage = { role: "user", content: query };
     setMessages((prev) => [...prev, newUserMessage]);
     setCurrentInput("");
 
-    // Simulate AI response (TODO: Replace with actual RAG query)
-    setTimeout(() => {
+    // Call the RAG Retrieval API to generate AI response
+    setIsGenerating(true);
+    try {
+      console.log('🚀 Sending question to API:', query);
+      console.log('📍 User ID:', userId, 'Topic ID:', topicId);
+      const data = await ragApi.generateResponse(userId, topicId, query);
+      console.log('✅ API Response:', data);
+      console.log('💾 Message storage status:', {
+        user_message_stored: data.user_message_stored,
+        assistant_message_stored: data.assistant_message_stored
+      });
+
+      // FALLBACK: If backend didn't store messages, store them manually
+      if (!data.user_message_stored) {
+        console.log('⚠️ Backend did not store user message, storing manually...');
+        try {
+          await ragApi.storeMessage(topicId, 'user', query);
+          console.log('✅ User message stored manually');
+        } catch (storeErr) {
+          console.error('❌ Failed to manually store user message:', storeErr);
+        }
+      }
+
+      if (!data.assistant_message_stored) {
+        console.log('⚠️ Backend did not store assistant message, storing manually...');
+        try {
+          await ragApi.storeMessage(topicId, 'assistant', data.response);
+          console.log('✅ Assistant message stored manually');
+        } catch (storeErr) {
+          console.error('❌ Failed to manually store assistant message:', storeErr);
+        }
+      }
+
       const aiResponse = {
-        role: "ai",
-        content: "Here is the detailed response you requested based on the uploaded sources. I've analyzed the documents and prepared this response!"
+        role: "assistant",
+        content: data.response,
+        citations: data.citations || []
       };
       setMessages((prev) => [...prev, aiResponse]);
-    }, 1200);
+    } catch (err) {
+      console.error('❌ Failed to generate response:', err);
+      const errorMessage = {
+        role: "assistant",
+        content: "Sorry, I encountered an error while generating a response. Please try again.",
+        citations: []
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleFileUpload = async (e) => {
@@ -451,34 +590,7 @@ export default function Dashboard() {
                 })
               )}
 
-              {/* Upload Progress Indicator */}
-              {(uploading || processing) && progress && (
-                <div className="p-3 bg-gray-800 rounded-lg border-2 border-blue-500">
-                  <div className="flex items-start gap-3">
-                    <Loader size={18} className="text-blue-400 flex-shrink-0 mt-1 animate-spin" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-100 truncate">
-                        {progress.file_name}
-                      </p>
-                      <div className="mt-2">
-                        <div className="flex justify-between text-xs text-gray-400 mb-1">
-                          <span>{progress.processing_stage || 'Uploading...'}</span>
-                          <span>{progress.progress_percent || 0}%</span>
-                        </div>
-                        <div className="w-full bg-gray-700 rounded-full h-2">
-                          <div
-                            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${progress.progress_percent || 0}%` }}
-                          />
-                        </div>
-                        {progress.stage_details && (
-                          <p className="text-xs text-gray-500 mt-1">{progress.stage_details}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+
             </div>
 
             {/* Sources Footer */}
@@ -531,28 +643,53 @@ export default function Dashboard() {
                 ) : (
                   // Messages display
                   <div className="flex-1 flex flex-col justify-end gap-4 pt-4">
-                    {messages.map((msg, index) => (
-                      <div
-                        key={index}
-                        className={`flex items-start gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                      >
+                    {loadingHistory ? (
+                      <div className="flex items-center justify-center h-32">
+                        <Loader size={32} className="animate-spin text-blue-600" />
+                      </div>
+                    ) : (
+                      messages.map((msg, index) => (
                         <div
-                          className={`flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md ${msg.role === "user" ? "bg-blue-600 text-white order-2" : "bg-gray-200 text-gray-700 order-1"
-                            }`}
+                          key={index}
+                          className={`flex items-start gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                         >
-                          {msg.role === "user" ? <User size={16} className="md:size-5" /> : <Brain size={16} className="md:size-5" />}
+                          <div
+                            className={`flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md ${msg.role === "user" ? "bg-blue-600 text-white order-2" : "bg-gray-200 text-gray-700 order-1"
+                              }`}
+                          >
+                            {msg.role === "user" ? <User size={16} className="md:size-5" /> : <Brain size={16} className="md:size-5" />}
+                          </div>
+                          <div
+                            className={`p-3 md:p-4 rounded-xl shadow-md max-w-[85%] sm:max-w-[75%] lg:max-w-[60%] break-words whitespace-pre-wrap transition-all ${msg.role === "user"
+                              ? "bg-blue-600 text-white order-1 rounded-br-none"
+                              : "bg-white text-gray-800 border border-gray-200 order-2 rounded-tl-none"
+                              }`}
+                            style={{ wordBreak: "break-word" }}
+                          >
+                            {msg.role === "assistant" ? (
+                              <MessageWithCitations content={msg.content} citations={msg.citations || []} />
+                            ) : (
+                              msg.content
+                            )}
+                          </div>
                         </div>
-                        <div
-                          className={`p-3 md:p-4 rounded-xl shadow-md max-w-[85%] sm:max-w-[75%] lg:max-w-[60%] break-words whitespace-pre-wrap transition-all ${msg.role === "user"
-                            ? "bg-blue-600 text-white order-1 rounded-br-none"
-                            : "bg-white text-gray-800 border border-gray-200 order-2 rounded-tl-none"
-                            }`}
-                          style={{ wordBreak: "break-word" }}
-                        >
-                          {msg.content}
+                      ))
+                    )}
+                    {/* Typing indicator */}
+                    {isGenerating && (
+                      <div className="flex items-start gap-3 justify-start">
+                        <div className="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md bg-gray-200 text-gray-700">
+                          <Brain size={16} className="md:size-5" />
+                        </div>
+                        <div className="p-3 md:p-4 rounded-xl shadow-md bg-white border border-gray-200 rounded-tl-none">
+                          <div className="flex gap-1">
+                            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                            <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                          </div>
                         </div>
                       </div>
-                    ))}
+                    )}
                     {/* Auto-scroll target */}
                     <div ref={messagesEndRef} />
                   </div>
@@ -600,7 +737,7 @@ export default function Dashboard() {
                   <button
                     type="submit"
                     onClick={handleSend}
-                    disabled={!currentInput.trim()}
+                    disabled={!currentInput.trim() || isGenerating}
                     className="p-2 md:p-3 text-white bg-blue-600 rounded-xl disabled:bg-gray-400 hover:bg-blue-700 hover:shadow-xl transition-all duration-200 flex-shrink-0 shadow-lg"
                   >
                     <Send size={20} className="md:size-5" />
