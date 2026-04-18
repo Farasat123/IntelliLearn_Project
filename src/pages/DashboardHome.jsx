@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
 	Plus,
-	Brain,
+	BookOpen,
 	LogOut,
 	X as CloseIcon,
 	MoreVertical,
@@ -236,9 +236,13 @@ export default function DashboardHome() {
 					: "bg-white border-gray-200 shadow-sm"
 					}`}
 			>
-				<div className="flex items-center gap-2">
-					<Brain size={20} className="text-blue-500" />
-					<h1 className={`text-lg font-bold ${isDark ? "text-white" : "text-gray-800"}`}>
+				<div className="flex items-center gap-3">
+					<img
+						src="/intellilogo.png"
+						alt="IntelliLearn Logo"
+						className="h-10 w-auto object-contain transition-transform duration-300 hover:scale-105"
+					/>
+					<h1 className={`text-xl font-bold tracking-tight ${isDark ? "text-white" : "text-gray-800"}`}>
 						IntelliLearn
 					</h1>
 				</div>
@@ -459,10 +463,10 @@ export default function DashboardHome() {
 														<>
 															<div className="flex items-start gap-3 mb-4">
 																<div
-																	className={`p-3 rounded-lg transition-colors ${isDark ? "bg-blue-500/20" : "bg-blue-100"
+																	className={`p-3 rounded-lg transition-colors ${isDark ? "bg-blue-500/20" : "bg-blue-50"
 																		}`}
 																>
-																	<Brain size={24} className="text-blue-500" />
+																	<BookOpen size={24} className="text-blue-600" />
 																</div>
 																<div className="flex-1 pr-8">
 																	<h4
@@ -489,7 +493,7 @@ export default function DashboardHome() {
 										className={`text-center py-12 rounded-2xl border transition-colors ${isDark ? "border-slate-800 bg-slate-900" : "border-dashed border-gray-200 bg-white"
 											}`}
 									>
-										<Brain size={48} className={`mx-auto mb-4 ${isDark ? "text-slate-600" : "text-gray-300"}`} />
+										<BookOpen size={48} className={`mx-auto mb-4 ${isDark ? "text-slate-600" : "text-blue-200"}`} />
 										<h3 className={`text-xl font-semibold mb-2 ${headingColor}`}>
 											No courses yet
 										</h3>

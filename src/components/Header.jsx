@@ -1,6 +1,6 @@
 // src/components/Header.jsx
 import React, { useState, useEffect } from "react";
-import { Brain, Menu, X } from "../assets/icons";
+import { Menu, X } from "../assets/icons";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function Header() {
@@ -60,10 +60,12 @@ export default function Header() {
           onClick={() => handleNavClick("/")}
           className="flex items-center gap-3 cursor-pointer"
         >
-          <div className="bg-gradient-to-br from-blue-600 to-blue-500 text-white p-2 rounded-lg shadow-inner shadow-blue-900/20">
-            <Brain size={22} />
-          </div>
-          <span className="text-xl font-bold text-gray-900">IntelliLearn</span>
+          <img 
+            src="/intellilogo.png" 
+            alt="IntelliLearn Logo" 
+            className="h-14 w-auto object-contain transition-transform duration-300 hover:scale-105" 
+          />
+          <span className="text-2xl font-bold text-gray-900 tracking-tight">IntelliLearn</span>
         </div>
 
         {/* Desktop Nav */}

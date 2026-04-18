@@ -78,10 +78,12 @@ export default function Login() {
           className="hidden lg:flex flex-col justify-center"
         >
           <div className="flex items-center gap-3 mb-8">
-            <div className="bg-gradient-to-br from-blue-600 to-blue-500 text-white p-2.5 rounded-xl shadow-lg shadow-blue-500/20">
-              <Brain size={28} />
-            </div>
-            <span className="text-2xl font-bold text-gray-900 tracking-tight">IntelliLearn</span>
+            <img 
+              src="/intellilogo.png" 
+              alt="IntelliLearn Logo" 
+              className="h-14 w-auto object-contain transition-transform duration-300 hover:scale-105" 
+            />
+            <span className="text-3xl font-bold text-gray-900 tracking-tight">IntelliLearn</span>
           </div>
 
           <h1 className="text-5xl font-extrabold text-gray-900 mb-6 leading-[1.1]">

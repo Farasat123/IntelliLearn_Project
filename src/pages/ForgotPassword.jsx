@@ -64,10 +64,12 @@ export default function ForgotPassword() {
           onClick={() => navigate("/")}
           className="flex items-center justify-center gap-3 mb-10 cursor-pointer group"
         >
-          <div className="bg-gradient-to-br from-blue-600 to-blue-500 text-white p-2 rounded-xl shadow-lg group-hover:scale-110 transition-transform">
-            <Brain size={24} />
-          </div>
-          <span className="text-xl font-bold text-gray-900">IntelliLearn</span>
+          <img 
+            src="/intellilogo.png" 
+            alt="IntelliLearn Logo" 
+            className="h-14 w-auto object-contain transition-transform duration-300 hover:scale-105" 
+          />
+          <span className="text-3xl font-bold text-gray-900 tracking-tight">IntelliLearn</span>
         </div>
 
         <form

@@ -25,10 +25,12 @@ export default function Footer() {
           
           {/* Brand Section */}
           <div className="md:col-span-2">
-            <a href="#" className="flex items-center gap-2 mb-4">
-              <div className="bg-blue-600 text-white p-2 rounded-lg">
-                <Brain size={24} />
-              </div>
+            <a href="#" className="flex items-center gap-3 mb-4">
+              <img 
+                src="/intellilogo.png" 
+                alt="IntelliLearn Logo" 
+                className="h-12 w-auto object-contain transition-transform duration-300 hover:scale-105" 
+              />
               <span className="text-xl font-bold text-white">IntelliLearn</span>
             </a>
 

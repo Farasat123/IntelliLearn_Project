@@ -1,5 +1,6 @@
 // src/components/CTA.jsx
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function CTA() {
   return (
@@ -14,12 +15,12 @@ export default function CTA() {
             <p className="text-lg text-blue-100 max-w-2xl mx-auto mb-8">
               Join hundreds of students who are already studying smarter with IntelliLearn
             </p>
-            <a
-              className="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold text-lg shadow-md hover:bg-gray-100 transition-all"
-              href="#"
+            <Link
+              className="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold text-lg shadow-md hover:bg-gray-100 transition-all cursor-pointer"
+              to="/signup"
             >
               Start Learning for Free
-            </a>
+            </Link>
           </div>
         </div>
       </div>

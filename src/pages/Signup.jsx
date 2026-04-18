@@ -89,10 +89,12 @@ export default function Signup() {
           className="hidden lg:flex flex-col justify-center"
         >
           <div className="flex items-center gap-3 mb-6">
-            <div className="bg-gradient-to-br from-blue-600 to-blue-500 text-white p-2.5 rounded-xl shadow-lg shadow-blue-500/20">
-              <Brain size={28} />
-            </div>
-            <span className="text-2xl font-bold text-gray-900 tracking-tight">IntelliLearn</span>
+            <img
+              src="/intellilogo.png"
+              alt="IntelliLearn Logo"
+              className="h-14 w-auto object-contain transition-transform duration-300 hover:scale-105"
+            />
+            <span className="text-3xl font-bold text-gray-900 tracking-tight">IntelliLearn</span>
           </div>
 
           <h1 className="text-5xl font-extrabold text-gray-900 mb-6 leading-[1.1]">
@@ -107,8 +109,8 @@ export default function Signup() {
           <div className="flex flex-col gap-3">
             {[
               "All-in-one study platform",
-              "Advanced AI tutor assistance",
-              "Track your progress in real-time"
+              "Advanced tutor assistance",
+              "Personalized exam prep"
             ].map((item, idx) => (
               <div key={idx} className="flex items-center gap-3 text-gray-700 font-semibold text-lg">
                 <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center">
@@ -194,8 +196,8 @@ export default function Signup() {
 
             {/* Signup Button */}
             <motion.button
-              whileHover={{ 
-                scale: 1.02, 
+              whileHover={{
+                scale: 1.02,
                 translateY: -3,
                 filter: "brightness(1.1)",
                 boxShadow: "0 20px 25px -5px rgb(59 130 246 / 0.4)"

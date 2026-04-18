@@ -1,6 +1,7 @@
 // src/components/Hero.jsx
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { ArrowRight } from "../assets/icons";
 
 export default function Hero() {
@@ -125,18 +126,21 @@ export default function Hero() {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.5, ease: "easeOut" }}
         >
-          <motion.a
-            className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white px-7 py-3 rounded-lg font-semibold shadow-lg shadow-blue-500/20"
-            href="#"
+          <motion.div
             whileHover={{ scale: 1.05, translateY: -2 }}
             whileTap={{ scale: 0.95 }}
           >
-            Get Started <ArrowRight size={18} />
-          </motion.a>
+            <Link
+              to="/signup"
+              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white px-7 py-3 rounded-lg font-semibold shadow-lg shadow-blue-500/20"
+            >
+              Get Started <ArrowRight size={18} />
+            </Link>
+          </motion.div>
 
           <motion.a
             className="bg-white/90 text-gray-900 px-7 py-3 rounded-lg font-semibold border border-gray-200 shadow-sm"
-            href="#"
+            href="#features"
             whileHover={{ scale: 1.05, translateY: -2 }}
             whileTap={{ scale: 0.95 }}
           >
