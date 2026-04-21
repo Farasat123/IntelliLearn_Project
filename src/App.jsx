@@ -21,6 +21,7 @@ import Dashboard from "./pages/Dashboard";
 import DashboardHome from "./pages/DashboardHome";
 import ForgotPassword from "./pages/ForgotPassword";     // <-- ADDED
 import UpdatePassword from "./pages/UpdatePassword";     // <-- ADDED
+import Confirm from "./pages/Confirm";
 
 export default function App() {
   return (
@@ -84,6 +85,16 @@ export default function App() {
           element={
             <div className="font-sans antialiased text-gray-900 bg-white m-0 p-0">
               <UpdatePassword />
+            </div>
+          }
+        />
+
+        {/* Email Confirmation */}
+        <Route
+          path="/confirm"
+          element={
+            <div className="font-sans antialiased text-gray-900 bg-white m-0 p-0">
+              <Confirm />
             </div>
           }
         />
