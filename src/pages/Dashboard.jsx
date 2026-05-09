@@ -42,12 +42,12 @@ function CopyButton({ text, isDark = false }) {
     <button
       onClick={handleCopy}
       className={`p-1.5 rounded-lg transition-all duration-200 flex items-center gap-1.5 ${copied
-          ? isDark
-            ? "bg-green-500/20 text-green-300 border-green-500/30"
-            : "bg-green-100 text-green-600 border-green-200"
-          : isDark
-            ? "hover:bg-slate-700 text-slate-300 hover:text-blue-300 border-transparent"
-            : "hover:bg-gray-100 text-gray-500 hover:text-blue-600 border-transparent"
+        ? isDark
+          ? "bg-green-500/20 text-green-300 border-green-500/30"
+          : "bg-green-100 text-green-600 border-green-200"
+        : isDark
+          ? "hover:bg-slate-700 text-slate-300 hover:text-blue-300 border-transparent"
+          : "hover:bg-gray-100 text-gray-500 hover:text-blue-600 border-transparent"
         } border`}
       title={copied ? "Copied!" : "Copy to clipboard"}
     >
@@ -71,21 +71,40 @@ function CitationBadge({ num, citation }) {
         [{num}]
       </sup>
       {hovered && citation && (
-        <div className="absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-72 p-4 bg-gray-900 text-white text-xs rounded-xl shadow-2xl border border-gray-700 animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <div className="font-bold mb-1.5 text-blue-400 flex items-center gap-2">
-            <FileText size={14} />
-            {citation.file_name}
-          </div>
-          <div className="text-gray-300 mb-2 pb-2 border-b border-gray-700">
-            {citation.section_title && (
-              <span className="font-medium text-gray-200">
-                {citation.section_title} •{" "}
-              </span>
-            )}
-            <span className="bg-gray-800 px-1.5 py-0.5 rounded">Page {citation.page}</span>
-          </div>
-          <div className="text-gray-400 leading-relaxed italic line-clamp-4 bg-gray-950/50 p-2 rounded-lg">
-            "{citation.chunk_text}"
+        <div className="absolute z-50 bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-80 p-4 bg-gray-900 text-white text-xs rounded-xl shadow-2xl border border-gray-700 animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div className="space-y-4">
+            {/* File Name */}
+            <div>
+              <div className="text-blue-400 font-bold mb-1.5 flex items-center gap-2">
+                <FileText size={14} />
+                File Name:
+              </div>
+              <div className="text-gray-200 bg-gray-800/50 p-2 rounded-lg border border-gray-800 break-words font-medium">
+                {citation.file_name}
+              </div>
+            </div>
+
+            {/* Extracted Text (Chunk) */}
+            <div>
+              <div className="text-blue-400 font-bold mb-1.5">
+                Extracted Text (Chunk):
+              </div>
+              <div className="text-gray-300 leading-relaxed italic bg-gray-950/50 p-3 rounded-lg border border-gray-800 whitespace-pre-wrap max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+                "{citation.chunk_text}"
+              </div>
+            </div>
+
+            {/* Citation Reference */}
+            <div className="pt-3 border-t border-gray-800 flex items-center justify-between">
+              <div className="text-blue-400 font-bold">
+                Citation reference [{num}]
+              </div>
+              {citation.page && (
+                <div className="bg-gray-800 px-2 py-0.5 rounded text-[10px] text-gray-400 font-bold">
+                  PAGE {citation.page}
+                </div>
+              )}
+            </div>
           </div>
           {/* Arrow */}
           <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-6 border-r-6 border-t-6 border-transparent border-t-gray-900"></div>
@@ -179,7 +198,7 @@ function MessageWithCitations({ content, citations, isDark = false }) {
   };
 
   return (
-    <div className={`prose max-w-none prose-p:my-0 prose-headings:mb-4 prose-li:my-0 ${isDark ? "prose-invert" : "prose-blue"}`}>
+    <div className={`prose max-w-none prose-p:my-0 prose-headings:mb-4 prose-li:my-0 prose-strong:font-bold ${isDark ? "prose-invert" : "prose-blue"}`}>
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
         {content}
       </ReactMarkdown>
@@ -966,20 +985,20 @@ export default function Dashboard() {
       {notification && (
         <div className="fixed bottom-6 right-6 z-[100] animate-in fade-in slide-in-from-right-10 duration-300">
           <div className={`flex items-center gap-3 p-4 rounded-xl shadow-2xl border ${notification.type === 'error'
-              ? isDark
-                ? 'bg-red-900/40 border-red-800 text-red-200'
-                : 'bg-red-50 border-red-100 text-red-800'
-              : isDark
-                ? 'bg-green-900/40 border-green-800 text-green-200'
-                : 'bg-green-50 border-green-100 text-green-800'
+            ? isDark
+              ? 'bg-red-900/40 border-red-800 text-red-200'
+              : 'bg-red-50 border-red-100 text-red-800'
+            : isDark
+              ? 'bg-green-900/40 border-green-800 text-green-200'
+              : 'bg-green-50 border-green-100 text-green-800'
             }`}>
             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${notification.type === 'error'
-                ? isDark
-                  ? 'bg-red-900/60 text-red-300'
-                  : 'bg-red-100 text-red-600'
-                : isDark
-                  ? 'bg-green-900/60 text-green-300'
-                  : 'bg-green-100 text-green-600'
+              ? isDark
+                ? 'bg-red-900/60 text-red-300'
+                : 'bg-red-100 text-red-600'
+              : isDark
+                ? 'bg-green-900/60 text-green-300'
+                : 'bg-green-100 text-green-600'
               }`}>
               {notification.type === 'error' ? <AlertCircle size={20} /> : <CheckCircle size={20} />}
             </div>
